@@ -102,18 +102,15 @@ footer a{color:var(--clayDeep)}
 </footer>
 </div>
 
-<script src="https://cdn.apple-cloudkit.com/ck/2/cloudkit.js"></script>
 <script>
 "use strict";
 
 // ── Config ──────────────────────────────────────────────────────────────────
-// API token: CloudKit Console (icloud.developer.apple.com) → iCloud.com.mohamedfarah.cadence
-// → API Access → CloudKit JS → new token with PUBLIC database READ. Paste it below.
+// NO tokens here, ever (see CLAUDE.md rule). The viewer talks to a Cloudflare Worker
+// that holds the CloudKit token as a server-side secret — deploy steps in
+// launch/share-proxy/worker.js, then paste the worker URL (not sensitive) below.
 const CONFIG = {
-  container: "iCloud.com.mohamedfarah.cadence",
-  apiToken: "REPLACE_WITH_CLOUDKIT_JS_API_TOKEN",
-  environment: "production",
-  recordType: "SharedSchedule"
+  proxy: "REPLACE_WITH_WORKER_URL"   // e.g. https://cadence-share.<acct>.workers.dev
 };
 
 // ── Rotation engine (JS twin of CadenceEngine — see §6.2 of the spec) ───────
@@ -231,24 +228,11 @@ function fail(msg) {
 (function main() {
   const token = (location.hash || "").replace(/^#/, "").trim();
   if (!token) return fail("This link is missing its key. Ask for the full link and open it again.");
-  if (CONFIG.apiToken.startsWith("REPLACE")) return fail("This viewer isn't configured yet — the schedule can't be loaded.");
-  if (typeof CloudKit === "undefined") return fail("Couldn't reach Apple's servers. Check your connection and reload.");
+  if (CONFIG.proxy.startsWith("REPLACE")) return fail("This viewer isn't configured yet — the schedule can't be loaded.");
 
-  CloudKit.configure({
-    containers: [{
-      containerIdentifier: CONFIG.container,
-      apiTokenAuth: { apiToken: CONFIG.apiToken, persist: false },
-      environment: CONFIG.environment
-    }]
-  });
-
-  CloudKit.getDefaultContainer().publicCloudDatabase
-    .fetchRecords(token)
-    .then(resp => {
-      if (resp.hasErrors || !resp.records.length) throw new Error("not found");
-      const payload = resp.records[0].fields.payload.value;
-      render(JSON.parse(payload));
-    })
+  fetch(CONFIG.proxy.replace(/\/$/, "") + "/" + encodeURIComponent(token))
+    .then(r => { if (!r.ok) throw new Error("not found"); return r.json(); })
+    .then(render)
     .catch(() => fail("This schedule isn't available — the link may have been turned off by its owner."));
 })();
 </script>

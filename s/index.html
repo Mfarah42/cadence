@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shared schedule — Cadence</title>
+<meta name="robots" content="noindex">
+<style>
+:root{
+  --paper:#F4EFEB;--cream:#FEFAF5;--ink:#1D1D1E;--ink2:#7A7977;--hair:#DBDAD7;
+  --clay:#D97D56;--clayDeep:#B5613D;--peach:#F2E0D2;--sun:#F5CF00;--body:#33312f
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#171311;--cream:#221C19;--ink:#F4EFEB;--ink2:#A39B92;--hair:#39302B;
+    --clay:#E08A63;--clayDeep:#C9764E;--peach:#33261D;--body:#D8D1CA
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.55}
+.wrap{max-width:760px;margin:0 auto;padding:36px 20px 80px}
+.serif{font-family:"New York",ui-serif,Georgia,"Times New Roman",serif}
+.brand{font-family:"New York",ui-serif,Georgia,serif;font-weight:600;font-size:22px}
+.brand .dot{color:var(--clay)}
+.meta{color:var(--ink2);font-size:14px}
+header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:28px}
+header a{color:var(--ink2);font-size:14px;text-decoration:none}
+header a:hover{color:var(--ink)}
+
+.hero{background:var(--cream);border:1px solid var(--hair);border-radius:22px;padding:26px 28px;display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+.hero .word{font-family:"New York",ui-serif,Georgia,serif;font-weight:600;font-size:64px;line-height:1;letter-spacing:-.02em}
+.hero .word.off{color:var(--clay)}
+.hero .word.on{color:var(--ink)}
+.hero .sub{font-size:15px;color:var(--ink2)}
+.hero .free{margin-left:auto;text-align:right}
+.hero .free b{display:block;font-family:"New York",ui-serif,Georgia,serif;font-size:24px;font-weight:600;color:var(--ink)}
+
+.months{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-top:26px}
+.month{background:var(--cream);border:1px solid var(--hair);border-radius:16px;padding:12px}
+.month h3{margin:0 0 8px;font-size:13px;font-weight:700;text-align:center}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.grid .wd{font-size:8px;font-weight:700;color:var(--ink2);text-align:center}
+.cell{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:var(--ink2)}
+.cell.on{background:var(--clay);color:#FEFAF5}
+.cell.off{border:1px solid var(--hair);color:var(--ink)}
+.cell.vacation{background:var(--sun);color:#1D1D1E}
+.cell.today{box-shadow:0 0 0 2px var(--clayDeep)}
+
+.legend{display:flex;gap:16px;margin-top:18px;font-size:13px;color:var(--ink2);align-items:center}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.legend .l-on i{background:var(--clay)}
+.legend .l-off i{border:1px solid var(--hair)}
+.legend .l-vac i{background:var(--sun)}
+
+.note{background:var(--cream);border:1px solid var(--hair);border-radius:16px;padding:22px 24px;margin-top:26px;color:var(--body);font-size:15px}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--hair);font-size:13px;color:var(--ink2)}
+footer a{color:var(--clayDeep)}
+#status{padding:60px 0;text-align:center;color:var(--ink2)}
+[hidden]{display:none !important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand">Cadence<span class="dot">.</span></div>
+  <a href="https://apps.apple.com/app/id6786077175">Get the app</a>
+</header>
+
+<div id="status">Loading schedule…</div>
+
+<main id="content" hidden>
+  <div class="hero">
+    <div>
+      <div class="meta" id="heroDate"></div>
+      <div class="word" id="heroWord"></div>
+      <div class="sub" id="heroSub"></div>
+    </div>
+    <div class="free">
+      <span class="meta">Next stretch off</span>
+      <b id="freeStat">—</b>
+      <span class="meta" id="freeRange"></span>
+    </div>
+  </div>
+
+  <div class="months" id="months"></div>
+
+  <div class="legend">
+    <span class="l-on"><i></i>On</span>
+    <span class="l-off"><i></i>Off</span>
+    <span class="l-vac"><i></i>Vacation</span>
+  </div>
+
+  <div class="note">
+    This is a live schedule shared from <strong>Cadence</strong> — it updates whenever the
+    owner's rotation changes. Only people with this exact link can see it.
+  </div>
+</main>
+
+<footer>
+  Shared with <a href="https://mfarah42.github.io/cadence/">Cadence</a>, the calm shift calendar.
+  Free, no account · <a href="https://mfarah42.github.io/cadence/privacy.html">Privacy</a>
+</footer>
+</div>
+
+<script src="https://cdn.apple-cloudkit.com/ck/2/cloudkit.js"></script>
+<script>
+"use strict";
+
+// ── Config ──────────────────────────────────────────────────────────────────
+// API token: CloudKit Console (icloud.developer.apple.com) → iCloud.com.mohamedfarah.cadence
+// → API Access → CloudKit JS → new token with PUBLIC database READ. Paste it below.
+const CONFIG = {
+  container: "iCloud.com.mohamedfarah.cadence",
+  apiToken: "REPLACE_WITH_CLOUDKIT_JS_API_TOKEN",
+  environment: "production",
+  recordType: "SharedSchedule"
+};
+
+// ── Rotation engine (JS twin of CadenceEngine — see §6.2 of the spec) ───────
+// Whole-calendar-day offsets via UTC day numbers (UTC has no DST, so this equals
+// counting Y/M/D day boundaries), then ((i % n) + n) % n. Never elapsed time.
+const DAY = 86400000;
+const dayNum = iso => { const [y, m, d] = iso.split("-").map(Number); return Math.round(Date.UTC(y, m - 1, d) / DAY); };
+const isoOf = (y, m, d) => `${String(y).padStart(4, "0")}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+const isoFromNum = n => { const t = new Date(n * DAY); return isoOf(t.getUTCFullYear(), t.getUTCMonth() + 1, t.getUTCDate()); };
+
+function makeEngine(data) {
+  const segments = (data.segments || []).slice()
+    .sort((a, b) => dayNum(a.start) - dayNum(b.start));
+  const overrides = new Map((data.overrides || []).map(o => [o.date, o.state]));
+
+  function activeSegment(n) {
+    let seg = null;
+    for (const s of segments) { if (dayNum(s.start) <= n) seg = s; } // latest start ≤ day
+    return seg || segments[0] || null;                              // else earliest governs the past
+  }
+
+  function stateAt(iso) {
+    const o = overrides.get(iso);
+    if (o) return o;
+    const n = dayNum(iso);
+    const seg = activeSegment(n);
+    if (!seg || !seg.pattern.length) return "off";
+    const idx = n - dayNum(seg.anchor);
+    const len = seg.pattern.length;
+    return seg.pattern[((idx % len) + len) % len] ? "on" : "off";
+  }
+
+  // Next free window on/after `iso`: consecutive days that aren't "on".
+  function nextFreeWindow(iso, horizon = 730) {
+    let n = dayNum(iso);
+    for (let i = 0; i < horizon; i++, n++) {
+      if (stateAt(isoFromNum(n)) !== "on") {
+        let end = n;
+        while (end - n < horizon && stateAt(isoFromNum(end + 1)) !== "on") end++;
+        return { start: isoFromNum(n), end: isoFromNum(end), length: end - n + 1 };
+      }
+    }
+    return null;
+  }
+
+  return { stateAt, nextFreeWindow };
+}
+
+// ── Rendering ───────────────────────────────────────────────────────────────
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const fmt = iso => { const [y, m, d] = iso.split("-").map(Number); return `${MONTHS[m - 1].slice(0, 3)} ${d}`; };
+
+function render(data) {
+  const engine = makeEngine(data);
+  const now = new Date();
+  const todayISO = isoOf(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  const todayState = engine.stateAt(todayISO);
+
+  document.getElementById("heroDate").textContent =
+    (data.label ? data.label + " — " : "") + "today, " + now.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
+  const word = document.getElementById("heroWord");
+  word.textContent = todayState === "on" ? "ON" : "OFF";
+  word.className = "word " + (todayState === "on" ? "on" : "off");
+  document.getElementById("heroSub").textContent =
+    todayState === "on" ? "Working today" : (todayState === "vacation" ? "On vacation" : "Off today");
+
+  const free = engine.nextFreeWindow(todayISO);
+  if (free) {
+    document.getElementById("freeStat").textContent = free.length + (free.length === 1 ? " day" : " days");
+    document.getElementById("freeRange").textContent = fmt(free.start) + " – " + fmt(free.end);
+  }
+
+  const host = document.getElementById("months");
+  let y = now.getFullYear(), m = now.getMonth() + 1;
+  for (let i = 0; i < 12; i++) {
+    host.appendChild(monthCard(y, m, engine, todayISO));
+    m++; if (m > 12) { m = 1; y++; }
+  }
+
+  document.getElementById("status").hidden = true;
+  document.getElementById("content").hidden = false;
+}
+
+function monthCard(year, month, engine, todayISO) {
+  const card = document.createElement("div");
+  card.className = "month";
+  const h = document.createElement("h3");
+  h.textContent = MONTHS[month - 1] + " " + year;
+  card.appendChild(h);
+
+  const grid = document.createElement("div");
+  grid.className = "grid";
+  for (const w of ["S", "M", "T", "W", "T", "F", "S"]) {
+    const el = document.createElement("div"); el.className = "wd"; el.textContent = w; grid.appendChild(el);
+  }
+  const first = new Date(Date.UTC(year, month - 1, 1));
+  for (let i = 0; i < first.getUTCDay(); i++) grid.appendChild(document.createElement("div"));
+  const days = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  for (let d = 1; d <= days; d++) {
+    const iso = isoOf(year, month, d);
+    const cell = document.createElement("div");
+    cell.className = "cell " + engine.stateAt(iso) + (iso === todayISO ? " today" : "");
+    cell.textContent = d;
+    grid.appendChild(cell);
+  }
+  card.appendChild(grid);
+  return card;
+}
+
+// ── Fetch ───────────────────────────────────────────────────────────────────
+function fail(msg) {
+  document.getElementById("status").textContent = msg;
+}
+
+(function main() {
+  const token = (location.hash || "").replace(/^#/, "").trim();
+  if (!token) return fail("This link is missing its key. Ask for the full link and open it again.");
+  if (CONFIG.apiToken.startsWith("REPLACE")) return fail("This viewer isn't configured yet — the schedule can't be loaded.");
+  if (typeof CloudKit === "undefined") return fail("Couldn't reach Apple's servers. Check your connection and reload.");
+
+  CloudKit.configure({
+    containers: [{
+      containerIdentifier: CONFIG.container,
+      apiTokenAuth: { apiToken: CONFIG.apiToken, persist: false },
+      environment: CONFIG.environment
+    }]
+  });
+
+  CloudKit.getDefaultContainer().publicCloudDatabase
+    .fetchRecords(token)
+    .then(resp => {
+      if (resp.hasErrors || !resp.records.length) throw new Error("not found");
+      const payload = resp.records[0].fields.payload.value;
+      render(JSON.parse(payload));
+    })
+    .catch(() => fail("This schedule isn't available — the link may have been turned off by its owner."));
+})();
+</script>
+</body>
+</html>

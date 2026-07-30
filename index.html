@@ -5,199 +5,194 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cadence — Am I on or off? The calm shift-rotation calendar</title>
 <meta name="description" content="Rotating shifts? Cadence shows ON or OFF at a glance and tells you exactly when you're next free. No account, no subscription — free forever.">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#FEFBF6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#18181C" media="(prefers-color-scheme: dark)">
 <meta property="og:title" content="Cadence — Am I on or off?">
 <meta property="og:description" content="The calm calendar for rotating-shift work. One glance, one answer. Free forever — no account, no subscription.">
 <meta property="og:url" content="https://mfarah42.github.io/cadence/">
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://mfarah42.github.io/cadence/img/01_today_off_light.png">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="stylesheet" href="shared.css">
+<script src="shared.js" defer></script>
 <style>
-:root{
-  --paper:#F4EFEB;--cream:#FEFAF5;--ink:#1D1D1E;--ink2:#7A7977;--hair:#DBDAD7;
-  --clay:#D97D56;--clayDeep:#B5613D;--peach:#F2E0D2;--sun:#F5CF00;--body:#33312f
+/* ---- Cadence-specific pieces, on the shared tokens ---- */
+.hero-grid { display: grid; grid-template-columns: 1fr auto; gap: 44px; align-items: center; }
+@media (max-width: 820px) {
+  .hero-grid { grid-template-columns: 1fr; }
+  .glance { justify-self: center; }
 }
-@media (prefers-color-scheme:dark){
-  :root{
-    --paper:#171311;--cream:#221C19;--ink:#F4EFEB;--ink2:#A39B92;--hair:#39302B;
-    --clay:#E08A63;--clayDeep:#C9764E;--peach:#33261D;--body:#D8D1CA
-  }
+.glance {
+  width: min(330px, 100%); background: var(--card); border: 1px solid var(--hairline);
+  border-radius: 24px; padding: 30px 30px 26px; box-shadow: var(--shadow);
+  transition: transform .3s ease, box-shadow .3s ease;
 }
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
-.serif{font-family:"New York",ui-serif,Georgia,"Times New Roman",serif}
-.wrap{max-width:860px;margin:0 auto;padding:48px 24px 96px}
-a{color:var(--clayDeep)}
-p{color:var(--body);font-size:17px}
-
-/* header */
-.brand{font-family:"New York",ui-serif,Georgia,serif;font-weight:600;font-size:26px;letter-spacing:-.01em}
-.brand .dot{color:var(--clay)}
-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:56px}
-header nav a{color:var(--ink2);text-decoration:none;font-size:15px;margin-left:22px}
-header nav a:hover{color:var(--ink)}
-
-/* hero */
-.hero{display:flex;gap:48px;align-items:center;flex-wrap:wrap}
-.hero-copy{flex:1 1 340px;min-width:300px}
-h1{font-family:"New York",ui-serif,Georgia,serif;font-weight:600;font-size:52px;line-height:1.08;letter-spacing:-.02em;margin:0 0 14px}
-.hero-sub{font-size:20px;color:var(--ink2);margin:0 0 30px;line-height:1.5}
-.store-btn{display:inline-block;background:var(--clayDeep);color:#FEFAF5;text-decoration:none;font-weight:600;font-size:17px;padding:14px 28px;border-radius:14px}
-.store-btn:hover{filter:brightness(1.06)}
-.store-micro{font-size:14px;color:var(--ink2);margin-top:12px}
-
-/* glance card */
-.glance{flex:0 1 330px;min-width:290px;background:var(--cream);border:1px solid var(--hair);border-radius:24px;padding:30px 30px 26px;box-shadow:0 1px 2px rgba(29,29,30,.04)}
-.glance .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--ink2);text-transform:uppercase}
-.glance .word{font-family:"New York",ui-serif,Georgia,serif;font-weight:600;font-size:96px;line-height:1.05;letter-spacing:-.02em;color:var(--clay);margin:2px 0 0}
-.glance .day{font-size:17px;color:var(--ink);font-weight:600;margin-top:2px}
-.glance .helper{font-size:15px;color:var(--ink2);margin-top:2px}
-.glance .bar{height:6px;background:var(--peach);border-radius:3px;margin-top:20px;overflow:hidden}
-.glance .bar i{display:block;height:100%;width:64%;background:var(--clay);border-radius:3px}
-.glance .strip{display:flex;gap:6px;margin-top:18px}
-.glance .pill{flex:1;text-align:center;font-size:11px;font-weight:700;letter-spacing:.04em;padding:7px 0;border-radius:9px;color:var(--ink2);border:1px solid var(--hair)}
-.glance .pill.on{background:var(--clay);border-color:var(--clay);color:#FEFAF5}
-.glance .pill.today{box-shadow:0 0 0 2px var(--clayDeep)}
-
-/* sections */
-section{margin-top:88px}
-h2{font-family:"New York",ui-serif,Georgia,serif;font-weight:600;font-size:32px;letter-spacing:-.01em;margin:0 0 10px}
-.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin-top:26px}
-.feature{background:var(--cream);border:1px solid var(--hair);border-radius:18px;padding:24px}
-.feature .tile{width:40px;height:40px;border-radius:12px;background:var(--peach);display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:14px}
-.feature h3{font-size:18px;margin:0 0 6px}
-.feature p{font-size:15px;margin:0;color:var(--ink2);line-height:1.55}
-
-/* screens */
-.screens{display:flex;gap:20px;overflow-x:auto;padding:6px 2px 14px;-webkit-overflow-scrolling:touch}
-.screens img{width:238px;height:auto;border-radius:22px;border:1px solid var(--hair);flex-shrink:0}
-
-/* niches */
-.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
-.chip{font-size:14px;font-weight:600;color:var(--ink);background:var(--cream);border:1px solid var(--hair);border-radius:999px;padding:8px 16px}
-.chip.hl{background:var(--peach);border-color:transparent}
-
-/* privacy */
-.privacy{background:var(--cream);border:1px solid var(--hair);border-radius:18px;padding:26px 30px}
-.privacy p{margin:8px 0 0}
-
-/* cta + footer */
-.cta{text-align:center}
-.cta .word-inline{color:var(--clay);font-weight:600}
-footer{margin-top:96px;padding-top:28px;border-top:1px solid var(--hair);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;color:var(--ink2);font-size:14px}
-footer a{color:var(--ink2);text-decoration:none;margin-left:18px}
-footer a:hover{color:var(--ink)}
-
-@media (max-width:600px){
-  h1{font-size:40px}
-  .glance .word{font-size:78px}
-  header nav a{margin-left:14px}
+.glance:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); }
+.glance .word {
+  font-size: 96px; font-weight: 500; line-height: 1.05;
+  letter-spacing: -.02em; color: var(--rust); margin: 2px 0 0;
 }
-@media (prefers-reduced-motion:no-preference){
-  .glance{transition:transform .3s ease}
-  .glance:hover{transform:translateY(-3px)}
+.glance .day { font-size: 17px; font-weight: 600; margin-top: 2px; }
+.glance .helper { font-size: 15px; color: var(--ink2); margin-top: 2px; }
+.glance .bar { height: 6px; background: var(--well-warm); border-radius: 3px; margin-top: 20px; overflow: hidden; }
+.glance .bar i { display: block; height: 100%; width: 64%; background: var(--rust); border-radius: 3px; }
+.glance .strip { display: flex; gap: 6px; margin-top: 18px; }
+.glance .pill {
+  flex: 1; text-align: center; font-size: 11px; font-weight: 700; letter-spacing: .04em;
+  padding: 7px 0; border-radius: 9px; color: var(--ink2); border: 1px solid var(--hairline);
 }
+.glance .pill.on { background: var(--rust-fill); border-color: var(--rust-fill); color: var(--on-rust); }
+.glance .pill.today { box-shadow: 0 0 0 2px var(--rust-deep); }
+@media (max-width: 600px) { .glance .word { font-size: 78px; } }
+
+.tile {
+  width: 40px; height: 40px; border-radius: 12px; background: var(--well-warm);
+  display: flex; align-items: center; justify-content: center; font-size: 19px; margin-bottom: 6px;
+}
+.screens { display: flex; gap: 20px; overflow-x: auto; padding: 6px 2px 14px; -webkit-overflow-scrolling: touch; }
+.screens img {
+  width: 238px; height: auto; border-radius: 22px;
+  border: 1px solid var(--hairline); box-shadow: var(--shadow); flex-shrink: 0;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.chips .chip { font-size: 13px; padding: 8px 16px; letter-spacing: .02em; text-transform: none; font-weight: 600; color: var(--ink); background: var(--card); }
+.chips .chip.hl { background: var(--well-warm); border-color: transparent; }
+.cta-sec { text-align: center; }
+.cta-sec .word-inline { color: var(--rust); font-weight: 600; }
+.cta-sec .btn-row { justify-content: center; }
 </style>
 </head>
 <body>
-<div class="wrap">
+<nav>
+  <div class="nav-inner">
+    <a class="nav-name serif" href="#top"><img src="icon.png" alt="" width="24" height="24">Cadence<span class="dot">.</span></a>
+    <div class="nav-links">
+      <a href="#features" class="collapse">Features</a>
+      <a href="support.html">Support</a>
+      <a href="privacy.html">Privacy</a>
+      <button id="themeBtn" class="theme-btn" type="button" aria-label="Switch theme" title="Theme: follows your system"><span id="themeIcon">◐</span></button>
+      <a class="nav-cta" href="https://apps.apple.com/us/app/cadence-am-i-on-or-off/id6786077175">App&nbsp;Store</a>
+    </div>
+  </div>
+</nav>
 
-<header>
-  <div class="brand">Cadence<span class="dot">.</span></div>
-  <nav>
-    <a href="support.html">Support</a>
-    <a href="privacy.html">Privacy</a>
-    <a href="https://apps.apple.com/app/id6786077175">Get the app</a>
-  </nav>
+<header class="wrap" id="top">
+  <div class="hero-grid">
+    <div>
+      <span class="eyebrow">The calm shift-rotation calendar</span>
+      <h1 class="serif">Am I on, <em>or off?</em></h1>
+      <p class="lede">The calm calendar for rotating-shift work. Set your rotation once — Cadence answers the only question that matters, at a glance.</p>
+      <div class="btn-row">
+        <a class="btn btn-clay" href="https://apps.apple.com/us/app/cadence-am-i-on-or-off/id6786077175">Download on the App&nbsp;Store</a>
+        <a class="btn btn-ghost" href="support.html">Get support</a>
+      </div>
+      <div class="hero-note">
+        <img src="icon.png" alt="Cadence app icon" width="40" height="40">
+        <span>Free forever · No account · No subscription</span>
+      </div>
+    </div>
+    <div class="glance" aria-label="Preview of the Cadence home screen: Off, day 9 of 14, back on Wednesday">
+      <span class="eyebrow" style="color:var(--ink3)">Today — Wed, Jul 1</span>
+      <div class="word serif">OFF</div>
+      <div class="day">Day 9 of 14 off</div>
+      <div class="helper">Back on the rig Wednesday</div>
+      <div class="bar"><i></i></div>
+      <div class="strip">
+        <div class="pill today">W</div><div class="pill">T</div><div class="pill">F</div>
+        <div class="pill">S</div><div class="pill">S</div><div class="pill">M</div><div class="pill on">T</div>
+      </div>
+    </div>
+  </div>
 </header>
 
-<div class="hero">
-  <div class="hero-copy">
-    <h1>Am I on<br>or off?</h1>
-    <p class="hero-sub">The calm calendar for rotating-shift work. Set your rotation once — Cadence answers the only question that matters, at a glance.</p>
-    <a class="store-btn" href="https://apps.apple.com/app/id6786077175">Download on the App&nbsp;Store</a>
-    <div class="store-micro">Free forever &middot; No account &middot; No subscription</div>
+<!-- ================= FEATURES ================= -->
+<section id="features" class="wrap">
+  <div class="section-head" data-reveal>
+    <span class="eyebrow">One glance</span>
+    <h2 class="serif">One glance. One answer.</h2>
+    <p>Every other shift app shows you a dense grid and makes you count squares. Cadence opens to one big word — <strong>ON</strong> or <strong>OFF</strong> — with how far you are through your stretch and when it flips.</p>
   </div>
-
-  <div class="glance" aria-label="Preview of the Cadence home screen: Off, day 9 of 14, back on Wednesday">
-    <div class="eyebrow">Today — Wed, Jul 1</div>
-    <div class="word">OFF</div>
-    <div class="day">Day 9 of 14 off</div>
-    <div class="helper">Back on the rig Wednesday</div>
-    <div class="bar"><i></i></div>
-    <div class="strip">
-      <div class="pill today">W</div><div class="pill">T</div><div class="pill">F</div>
-      <div class="pill">S</div><div class="pill">S</div><div class="pill">M</div><div class="pill on">T</div>
-    </div>
-  </div>
-</div>
-
-<section>
-  <h2>One glance. One answer.</h2>
-  <p style="max-width:620px">Every other shift app shows you a dense grid and makes you count squares. Cadence opens to one big word — <strong>ON</strong> or <strong>OFF</strong> — with how far you are through your stretch and when it flips.</p>
-  <div class="features">
-    <div class="feature">
+  <div class="grid" data-reveal-group>
+    <div class="card">
       <div class="tile">☀️</div>
-      <h3>When am I free?</h3>
+      <h3 class="serif">When am I free?</h3>
       <p>Next weekend off, next 3+ day stretch, next full week — as real dates, one tap away. Plan life without scanning a calendar by eye.</p>
     </div>
-    <div class="feature">
+    <div class="card">
       <div class="tile">🔁</div>
-      <h3>Any rotation</h3>
+      <h3 class="serif">Any rotation</h3>
       <p>14/14, 7/7, 4/3, 2-2-3 Pitman, or a custom pattern all your own. Swapped a day? Tap it and override — the pattern stays intact.</p>
     </div>
-    <div class="feature">
+    <div class="card">
       <div class="tile">🔒</div>
-      <h3>Yours, not ours</h3>
+      <h3 class="serif">Yours, not ours</h3>
       <p>No account, no sign-up, no ads. Your schedule lives on your phone and your own iCloud. Nothing useful is ever locked.</p>
     </div>
   </div>
 </section>
 
-<section>
-  <h2>Calm by design</h2>
-  <p style="max-width:620px">Warm paper tones, an editorial serif, and a dark mode that's actually considered — because you check this at 5 a.m.</p>
-  <div class="screens">
+<!-- ================= SCREENS ================= -->
+<section class="wrap">
+  <div class="section-head" data-reveal>
+    <span class="eyebrow">Calm by design</span>
+    <h2 class="serif">Warm paper, editorial serif</h2>
+    <p>And a dark mode that's actually considered — because you check this at 5 a.m.</p>
+  </div>
+  <div class="screens" data-reveal>
     <img src="img/01_today_off_light.png" alt="Cadence Today screen showing OFF, day 9 of 14, with the next 7 days" loading="lazy">
     <img src="img/02_free_light.png" alt="When am I free screen showing the next free stretch as dates" loading="lazy">
     <img src="img/04_today_off_dark.png" alt="Cadence Today screen in dark mode" loading="lazy">
   </div>
 </section>
 
-<section>
-  <h2>Built for rotating-shift life</h2>
-  <div class="chips">
-    <span class="chip hl">Oilfield &amp; offshore 14/14</span>
-    <span class="chip">Firefighters 2-2-3</span>
-    <span class="chip">Nurses</span>
-    <span class="chip">Police &amp; EMS</span>
-    <span class="chip">Pilots &amp; crew</span>
-    <span class="chip">Any custom rotation</span>
+<!-- ================= NICHES ================= -->
+<section class="wrap">
+  <div class="section-head" data-reveal>
+    <span class="eyebrow">Who it's for</span>
+    <h2 class="serif">Built for rotating-shift life</h2>
   </div>
-  <p style="margin-top:20px;max-width:620px">Share your year with family as a calendar file or image — they don't need the app or an account. Day-before reminders and shift alarms mean you never miss a start.</p>
+  <div data-reveal>
+    <div class="chips">
+      <span class="chip hl">Oilfield &amp; offshore 14/14</span>
+      <span class="chip">Firefighters 2-2-3</span>
+      <span class="chip">Nurses</span>
+      <span class="chip">Police &amp; EMS</span>
+      <span class="chip">Pilots &amp; crew</span>
+      <span class="chip">Any custom rotation</span>
+    </div>
+    <p style="margin-top:20px; max-width:62ch; color:var(--ink2)">Share your year with family as a calendar file or image — they don't need the app or an account. Day-before reminders and shift alarms mean you never miss a start.</p>
+  </div>
 </section>
 
-<section>
-  <div class="privacy">
-    <h2 style="font-size:24px">Privacy is the point</h2>
-    <p>A work schedule says where you are and when your home is empty. Cadence collects <strong>nothing</strong> — no analytics SDKs, no tracking, no account, no email. The App Store label reads "Data Not Collected," and it's true. <a href="privacy.html">Read the two-minute policy</a>.</p>
+<!-- ================= PRIVACY ================= -->
+<section class="wrap">
+  <div class="panel" data-reveal>
+    <p><span class="pulse"></span><b>Privacy is the point</b></p>
+    <p style="color:var(--ink2); max-width:68ch; margin-top:12px">A work schedule says where you are and when your home is empty. Cadence collects <strong style="color:var(--ink)">nothing</strong> — no analytics SDKs, no tracking, no account, no email. The App Store label reads "Data Not Collected," and it's true.</p>
+    <p class="stamp"><a href="privacy.html">Read the two-minute policy →</a></p>
   </div>
 </section>
 
-<section class="cta">
-  <h2>Know when you're <span class="word-inline">OFF</span>.</h2>
-  <p style="margin:14px 0 26px">Set up takes under a minute. No account. Free forever.</p>
-  <a class="store-btn" href="https://apps.apple.com/app/id6786077175">Download on the App&nbsp;Store</a>
+<!-- ================= CTA ================= -->
+<section class="wrap cta-sec">
+  <div data-reveal>
+    <h2 class="serif">Know when you're <span class="word-inline">OFF</span>.</h2>
+    <p style="margin:14px 0 0; color:var(--ink2)">Set up takes under a minute. No account. Free forever.</p>
+    <div class="btn-row">
+      <a class="btn btn-clay" href="https://apps.apple.com/us/app/cadence-am-i-on-or-off/id6786077175">Download on the App&nbsp;Store</a>
+    </div>
+  </div>
 </section>
 
-<footer>
-  <div>Cadence — the calm shift calendar. © 2026 Mohamed Farah.</div>
-  <div>
-    <a href="support.html">Support</a>
-    <a href="privacy.html">Privacy</a>
-  </div>
-</footer>
-
+<div class="wrap">
+  <footer>
+    <span>© 2026 Mohamed Farah · <a href="support.html">Support</a> · <a href="privacy.html">Privacy</a></span>
+    <span class="serif" style="font-style:italic">Calm software, honestly made.</span>
+  </footer>
 </div>
 </body>
 </html>
